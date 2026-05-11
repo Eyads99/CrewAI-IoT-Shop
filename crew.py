@@ -2,6 +2,9 @@ import os
 from crewai import Agent, Task, Crew, Process
 from crewai.tools import tool
 from vector_db import SmartHomeVectorDB
+from pydantic import BaseModel, Field
+from typing import List, Optional
+from datetime import datetime
 
 MODEL = os.getenv("LLM_MODEL", "ollama/llama3.2:1b")
 #MODEL = "ollama/llama3.2:1b"
@@ -65,9 +68,11 @@ def create_iot_crew(topic: str, chat_history: str = "", rag_context_list: list =
 
     researcher = Agent(
         role="Smart Home Expert",
-        goal="Answer the user's questions about smart home devices. Use the Search Smart Home Devices tool if you need to find specific products.",
-        backstory="Expert in IoT devices and smart homes for Emirati telecommunications company e&, you help users with "
-                  "their queries related to IoT devices. You decide whether a query requires searching for specific products or can be answered directly.",
+        goal="Answer the user's questions about smart home devices. Use the Search Smart Home Devices tool if you need "
+             "to find specific products.",
+        backstory="Expert in IoT devices and smart homes for Emirati telecommunications company e&, you help users with"
+                  " their queries related to IoT devices. You decide whether a query requires searching for "
+                  "specific products or can be answered directly.",
         llm=MODEL,
         tools=[search_smart_home_devices],
         verbose=True
@@ -111,7 +116,8 @@ def create_iot_crew(topic: str, chat_history: str = "", rag_context_list: list =
 
     task1 = Task(
         description=f"""
-        Analyze the user's query and respond appropriately. If they are asking for recommendations or specific products, use your tool to search for them. If it's a general query, answer directly.
+        Analyze the user's query and respond appropriately. If they are asking for recommendations or specific products,
+         use your tool to search for them. If it's a general query, answer directly.
 
         CHAT HISTORY:
         {chat_history}
@@ -216,9 +222,8 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
         goal="Help users troubleshoot issues with their smart home and IoT devices.",
         backstory="You are a technical support specialist for IoT devices. You provide clear, step-by-step troubleshooting instructions to resolve user problems.",
         llm=MODEL,
-        tools=[troubleshooting_guide_search],
-        verbose=True,
-        #output_pydantic=IoTResponse, to fix a specific output format
+        tools=[troubleshooting_guide_search],  # scoped to its own tool
+        verbose=True
     )
 
     manager = Agent(
@@ -227,9 +232,7 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
         backstory="You are the manager of an IoT support and sales team. You analyze user queries, decide whether they need troubleshooting help or product recommendations, delegate tasks to your team, and assemble the final response.",
         llm=MODEL,
         allow_delegation=True,
-        verbose=True,
-        #reasoning=True,
-        #max_reasoning_attempts=3
+        verbose=True
     )
 
     writer = Agent(
@@ -269,11 +272,10 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
         tasks=[main_task,summary_task],
         manager_agent=manager,
         process=Process.hierarchical,
-        # Reasoning=False,
-        # max_reasoning_attempts=False,
-        # planning=True,
-        # planning_llm='ollama/gemma4:26b',
-        # step_callback=take action after every agent action,
+        #planning=True,
+        #planning_llm='ollama/gemma4:26b',
+        #step_callback=take action after every agent action
         verbose=True,
         tracing=True
     )
+
