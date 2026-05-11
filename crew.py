@@ -174,6 +174,22 @@ def create_iot_crew(topic: str, chat_history: str = "", rag_context_list: list =
 
 
 
+class IoTResponse(BaseModel):
+    recommended_products: List[str] = Field(
+        description="Names of the recommended products, empty list if none apply"
+    )
+    reasoning: str = Field(
+        description="Why these products or steps were chosen for the user's needs"
+    )
+    price_range: str = Field(
+        description="Approximate price range of any recommendations, or 'N/A' if not applicable"
+    )
+    troubleshooting_steps: Optional[List[str]] = Field(
+        default=None,
+        description="Numbered step-by-step troubleshooting instructions if the user had a device issue"
+    )
+
+
 def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list: list = None):
     if rag_context_list is None:
         rag_context_list = []
@@ -192,10 +208,12 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
         ])
         return context
 
-    @tool("Troubleshooting Guide Search")
+    @tool("Troubleshooting Knowledge Base")
     def troubleshooting_guide_search(query: str) -> str:
-        """Useful to search for troubleshooting steps for IoT and smart home devices.
-        Provides mocked knowledge base answers for common issues."""
+        """Search the support knowledge base for step-by-step troubleshooting
+        instructions for common IoT device problems: going offline, resetting,
+        being unresponsive, or installation failures.
+        Use this when the user reports a problem with an existing device."""
         knowledge_base = {
             "offline": "1. Check the power source. 2. Restart the router. 3. Re-pair the device.",
             "reset": "1. Hold the reset button for 10 seconds. 2. Wait for the LED to blink rapidly.",
@@ -219,8 +237,11 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
 
     troubleshooter = Agent(
         role="IoT Troubleshooter",
-        goal="Help users troubleshoot issues with their smart home and IoT devices.",
-        backstory="You are a technical support specialist for IoT devices. You provide clear, step-by-step troubleshooting instructions to resolve user problems.",
+        goal="Diagnose and resolve issues with smart home and IoT devices.",
+        backstory=(
+            "You are a technical support specialist. You use the troubleshooting "
+            "knowledge base to give users clear, step-by-step resolution paths."
+        ),
         llm=MODEL,
         tools=[troubleshooting_guide_search],  # scoped to its own tool
         verbose=True
