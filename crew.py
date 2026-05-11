@@ -178,9 +178,6 @@ class IoTResponse(BaseModel):
     recommended_products: List[str] = Field(
         description="Names of the recommended products, empty list if none apply"
     )
-    reasoning: str = Field(
-        description="Why these products or steps were chosen for the user's needs"
-    )
     price_range: str = Field(
         description="Approximate price range of any recommendations, or 'N/A' if not applicable"
     )
