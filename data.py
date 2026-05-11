@@ -44,60 +44,7 @@ smart_home_data = [
         "url": "example.com/plug_001",
         "price": "25 USD",
     },
-{
-    "id": "speaker_001",
-    "name": "Smart Voice Speaker",
-    "category": "Entertainment",
-    "description": "A voice-controlled smart speaker with integrated virtual assistant and multi-room audio support.",
-    "features": "Voice assistant, Bluetooth, WiFi streaming, multi-room sync",
-    "url": "example.com/speaker_001",
-    "price": "45.00 USD"
-  },
-  {
-    "id": "vacuum_001",
-    "name": "Smart Robot Vacuum",
-    "category": "Cleaning",
-    "description": "Autonomous vacuum cleaner with intelligent room mapping and obstacle avoidance.",
-    "features": "LiDAR navigation, scheduled cleaning, auto recharge, app control",
-    "url": "example.com/vacuum_001",
-    "price": "180.00 USD"
-  },
-  {
-    "id": "fridge_001",
-    "name": "Smart Refrigerator",
-    "category": "Kitchen",
-    "description": "WiFi-enabled refrigerator with inventory tracking and touchscreen controls.",
-    "features": "Internal camera, grocery tracking, touch display, temperature alerts",
-    "url": "example.com/fridge_001",
-    "price": "950.00 USD"
-  },
-  {
-    "id": "mirror_001",
-    "name": "Smart Fitness Mirror",
-    "category": "Health",
-    "description": "Interactive fitness mirror that streams workouts and tracks exercise performance.",
-    "features": "Live workouts, AI posture correction, heart rate sync, voice commands",
-    "url": "example.com/mirror_001",
-    "price": "650.00 USD"
-  },
-  {
-    "id": "garden_001",
-    "name": "Smart Garden Hub",
-    "category": "Outdoor",
-    "description": "Automated plant monitoring and irrigation system for indoor and outdoor gardens.",
-    "features": "Moisture sensors, automatic watering, weather sync, mobile alerts",
-    "url": "example.com/garden_001",
-    "price": "75.00 USD"
-  },
-  {
-    "id": "bed_001",
-    "name": "Smart Sleep Bed",
-    "category": "Health",
-    "description": "Adjustable smart bed that monitors sleep quality and adapts firmness automatically.",
-    "features": "Sleep tracking, temperature control, anti-snore adjustment, app insights",
-    "url": "example.com/bed_001",
-    "price": "1200.00 USD"
-  },
+
 ]
 
 user_data = [
@@ -106,23 +53,23 @@ user_data = [
         "name": "Ahmed",
         "email": "ahmed@example.com",
         "elife_member": True,
-        "crm":"postpaid",
+        "crm": "postpaid",
         "phone": "123456789"
     },
     {
         "id": "2",
         "name": "Mohamed",
         "email": "mohamed@example.com",
-        "crm":"postpaid",
+        "crm": "postpaid",
         "elife_member": False,
         "phone": "987654321"
     },
     {
         "id": "3",
-        "name": "Eyad", 
+        "name": "Eyad",
         "email": "eyad@example.com",
         "elife_member": False,
-        "crm":"prepaid",
+        "crm": "prepaid",
         "phone": "123456789"
     },
 ]
