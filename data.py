@@ -6,6 +6,7 @@ smart_home_data = [
         "description": "A WiFi-enabled LED bulb with adjustable brightness and color temperature.",
         "features": "Dimmable, RGB colors, voice control, energy efficient",
         "url": "example.com/light_001",
+        "price": "2.00 USD",
     },
     {
         "id": "thermo_001",
@@ -14,6 +15,7 @@ smart_home_data = [
         "description": "Learns user preferences and automatically adjusts room temperature.",
         "features": "AI scheduling, remote control, energy saving mode",
         "url": "example.com/thermo_001",
+        "price": "20.00 USD",
     },
     {
         "id": "lock_001",
@@ -22,6 +24,7 @@ smart_home_data = [
         "description": "Keyless entry system controlled via mobile app or fingerprint.",
         "features": "Fingerprint, PIN, remote unlock, auto-lock",
         "url": "example.com/lock_001",
+        "price": "100.00 USD",
     },
     {
         "id": "cam_001",
@@ -30,6 +33,7 @@ smart_home_data = [
         "description": "Indoor/outdoor camera with motion detection and night vision.",
         "features": "1080p, motion alerts, cloud storage, night vision",
         "url": "example.com/cam_001",
+        "price": "200.00 USD",
     },
     {
         "id": "plug_001",
@@ -38,5 +42,31 @@ smart_home_data = [
         "description": "Turns any appliance into a smart device with remote control.",
         "features": "App control, scheduling, energy monitoring",
         "url": "example.com/plug_001",
+        "price": "25 USD",
     }
 ]
+
+user_data = [
+    {
+        "id": "1",
+        "name": "Ahmed",
+        "email": "ahmed@example.com",
+        "elife_member": True,
+        "phone": "123456789"
+    },
+    {
+        "id": "2",
+        "name": "Mohamed",
+        "email": "mohamed@example.com",
+        "elife_member": False,
+        "phone": "987654321"
+    },
+    {
+        "id": "3",
+        "name": "Eyad", 
+        "email": "eyad@example.com",
+        "elife_member": False,
+        "phone": "123456789"
+    },
+]
+

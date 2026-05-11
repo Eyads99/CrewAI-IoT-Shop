@@ -1,3 +1,4 @@
+import os
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -17,7 +18,7 @@ class SmartHomeVectorDB:
 
     def _build_db(self):
         for item in smart_home_data:
-            text = f"{item['name']} {item['category']} {item['description']} {item['features']} {item['url']}"
+            text = f"{item['name']} {item['category']} {item['description']} {item['features']} {item['price']}"
             embedding = self.model.encode(text)
 
             self.index.add(np.array([embedding], dtype=np.float32))
@@ -28,7 +29,7 @@ class SmartHomeVectorDB:
         query_vec = self.model.encode(query)
         distances, indices = self.index.search(
             np.array([query_vec], dtype=np.float32),
-            k
+            k # get top 2 most relevant
         )
 
         results = []

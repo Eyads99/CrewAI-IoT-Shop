@@ -1,4 +1,4 @@
-from crew import create_crew_basic
+from crew import create_crew_basic, create_iot_crew
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -9,4 +9,6 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
     crew = create_crew_basic("Egypt")
+    print(crew.kickoff())
+    crew = create_iot_crew("I want to reduce my electricity bill")
     print(crew.kickoff())

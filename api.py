@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from flow import ResearchFlow
-from rag import rag_query, rag_chat
+from rag import rag_query, rag_chat, rag_chat_planner
 from chat_store import chat_store
 
 app = FastAPI()
@@ -56,13 +56,39 @@ def send_message(req: ChatRequest):
     # Get history
     history = chat_store.get_messages(req.chat_id)
 
-    # Run RAG + Crew
-    response = rag_chat(req.message, history)
+    # Run RAG & Crew
+    response, rag_context = rag_chat(req.message, history)
 
     # Save AI response
-    chat_store.add_message(req.chat_id, "AI", str(response))
+    chat_store.add_message(req.chat_id, "AI", str(response), rag_context=rag_context)
 
     return {
         "chat_id": req.chat_id,
-        "response": response
+        "response": str(response)
     }
+
+@app.post("/chat/send/planner")
+def send_message_planner(req: ChatRequest):
+    """Uses the hierarchical crew planner for combined recommendation + troubleshooting."""
+    if req.chat_id not in chat_store.chats:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    chat_store.add_message(req.chat_id, "user", req.message)
+    history = chat_store.get_messages(req.chat_id)
+
+    response, rag_context = rag_chat_planner(req.message, history)
+
+    chat_store.add_message(req.chat_id, "AI", str(response), rag_context=rag_context)
+
+    return {
+        "chat_id": req.chat_id,
+        "response": str(response)
+    }
+
+@app.get("/chat/{chat_id}/history")
+def get_chat_history(chat_id: str):
+    if chat_id not in chat_store.chats:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    history = chat_store.get_messages(chat_id)
+    return {"chat_id": chat_id, "history": history}

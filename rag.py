@@ -1,5 +1,5 @@
 from vector_db import SmartHomeVectorDB
-from crew import create_crew_with_context
+from crew import create_iot_crew, create_iot_crew_planner
 
 def format_chat_history(messages, max_turns=5):
     # Keep last N turns to avoid token explosion
@@ -18,29 +18,26 @@ db = SmartHomeVectorDB()
 
 
 def rag_chat(user_query: str, chat_history: list):
-    #  retrieve context
-    results = db.search(user_query)
-
-    context = "\n".join([
-        f"{r['name']}: {r['description']} (Features: {r['features']})"
-        for r in results
-    ])
-
     # format memory
     history_text = format_chat_history(chat_history)
 
-    # combine everything
-    full_context = f"""
-    CHAT HISTORY:
-    {history_text}
+    # Run crew with memory
+    rag_context_list = []
+    crew = create_iot_crew(user_query, history_text, rag_context_list=rag_context_list)
 
-    RETRIEVED KNOWLEDGE:
-    {context}
-    """
+    result = crew.kickoff() # needed to actually run crew
+    return result, rag_context_list
 
-    crew = create_crew_with_context(user_query, full_context) # manually run crew from here
 
-    return crew.kickoff() # needed to actually run crew
+def rag_chat_planner(user_query: str, chat_history: list):
+    """Use the hierarchical crew planner for combined recommendation + troubleshooting."""
+    history_text = format_chat_history(chat_history)
+
+    rag_context_list = []
+    crew = create_iot_crew_planner(user_query, history_text, rag_context_list=rag_context_list)
+
+    result = crew.kickoff()
+    return result, rag_context_list
 
 
 def rag_query(user_query: str):
@@ -48,7 +45,7 @@ def rag_query(user_query: str):
     results = db.search(user_query)
 
     context = "\n".join([
-        f"{r['name']}: {r['description']} (Features: {r['features']})"
+        f"{r['name']}: {r['description']} (Features: {r['features']}, Price: {r['price']})"
         for r in results
     ])
 
