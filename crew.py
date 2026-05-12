@@ -298,9 +298,13 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
     )
 
 
-def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_list: list = None):
+def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_list: list = None, user_data: dict = None):
     if rag_context_list is None:
         rag_context_list = []
+
+    user_info_str = ""
+    if user_data:
+        user_info_str = f"USER INFORMATION: {user_data}\n"
 
     @tool("Search Smart Home Devices")
     def search_smart_home_devices(query: str) -> str:
@@ -336,8 +340,10 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         backstory=(
             "You are a friendly representative for an IoT smart home company. "
             "You greet users and respond to casual small talk. "
-            "Crucially, if a user asks about anything NOT related to IoT or smart home devices (like politics, sports, general knowledge), "
+            "Crucially, if a user asks about anything NOT related to IoT or smart home devices "
+            "(like politics, sports, general knowledge), "
             "you politely explain that you can only assist with smart home and IoT topics."
+            "If asked say that you can not comment about other companies or other products"
         ),
         llm=MODEL,
         verbose=True
@@ -382,6 +388,9 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     main_task = Task(
         description=f"""
         Analyze the user's query and provide the best response by delegating to the appropriate agent.
+        
+        {user_info_str} # place holder for now will be provide extra info as well later
+        
         - If the user is making small talk or asking non-IoT questions, delegate to the Chit-Chat Specialist.
         - If the user is asking for broad recommendations and hasn't described their home, delegate to the Home Profiler to ask for details (bedrooms, bathrooms, etc.).
         - If the user describes their home or asks for a specific group of products, delegate to the Home Profiler to recommend devices.

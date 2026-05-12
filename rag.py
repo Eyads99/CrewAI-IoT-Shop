@@ -55,12 +55,12 @@ def rag_query(user_query: str):
     return crew.kickoff()
 
 
-def rag_chat_full_flow(user_query: str, chat_history: list):
+def rag_chat_full_flow(user_query: str, chat_history: list, user_data: dict = None):
     """Use the hierarchical full flow crew for end-to-end interactions."""
     history_text = format_chat_history(chat_history)
 
     rag_context_list = []
-    crew = create_iot_full_flow_crew(user_query, history_text, rag_context_list=rag_context_list)
+    crew = create_iot_full_flow_crew(user_query, history_text, rag_context_list=rag_context_list, user_data=user_data)
 
     result = crew.kickoff()
     return result, rag_context_list

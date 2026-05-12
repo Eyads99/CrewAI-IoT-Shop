@@ -27,8 +27,26 @@ smart_home_data = [
         "price": "100.00 AED",
     },
     {
+        "id": "smoke_001",
+        "name": "Smart Smoke Detector",
+        "category": "Safety",
+        "description": "Wi-Fi enabled smoke detector with real-time alerts and voice alarms.",
+        "features": "Smoke detection, mobile alerts, battery backup, voice warning",
+        "url": "example.com/smoke_001",
+        "price": "150.00 AED"
+    },
+    {
         "id": "cam_001",
         "name": "Smart Security Camera",
+        "category": "Security",
+        "description": "Indoor/outdoor camera with motion detection and night vision.",
+        "features": "1080p, motion alerts, cloud storage, night vision",
+        "url": "example.com/cam_001",
+        "price": "200.00 AED",
+    },
+    {
+        "id": "cam_001",
+        "name": "Smart Smoke detector",
         "category": "Security",
         "description": "Indoor/outdoor camera with motion detection and night vision.",
         "features": "1080p, motion alerts, cloud storage, night vision",
@@ -52,6 +70,15 @@ smart_home_data = [
         "features": "Voice assistant, Bluetooth, WiFi streaming, multi-room sync",
         "url": "example.com/speaker_001",
         "price": "45.00 AED"
+    },
+    {
+        "id": "tv_001",
+        "name": "Smart 4K TV",
+        "category": "Entertainment",
+        "description": "Ultra HD smart television with built-in streaming apps and voice assistant support.",
+        "features": "4K UHD, HDR, voice control, screen casting, WiFi connectivity",
+        "url": "example.com/tv_001",
+        "price": "550.00 AED"
     },
     {
         "id": "vacuum_001",
@@ -88,16 +115,8 @@ smart_home_data = [
         "features": "Moisture sensors, automatic watering, weather sync, mobile alerts",
         "url": "example.com/garden_001",
         "price": "75.00 AED"
-    },
-    {
-        "id": "tv_001",
-        "name": "Smart 4K TV",
-        "category": "Entertainment",
-        "description": "Ultra HD smart television with built-in streaming apps and voice assistant support.",
-        "features": "4K UHD, HDR, voice control, screen casting, WiFi connectivity",
-        "url": "example.com/tv_001",
-        "price": "550.00 AED"
     }
+
 
 ]
 
@@ -128,3 +147,9 @@ user_data = [
     },
 ]
 
+def get_user_by_email(email: str):
+    """Retrieve user data by email."""
+    for user in user_data:
+        if user["email"].lower() == email.lower():
+            return user
+    return None
