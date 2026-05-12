@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from flow import ResearchFlow
-from rag import rag_query, rag_chat, rag_chat_planner
+from rag import rag_query, rag_chat, rag_chat_planner, rag_chat_full_flow
 from chat_store import chat_store
 
 app = FastAPI()
@@ -77,6 +77,24 @@ def send_message_planner(req: ChatRequest):
     history = chat_store.get_messages(req.chat_id)
 
     response, rag_context = rag_chat_planner(req.message, history)
+
+    chat_store.add_message(req.chat_id, "AI", str(response), rag_context=rag_context)
+
+    return {
+        "chat_id": req.chat_id,
+        "response": str(response)
+    }
+
+@app.post("/chat/send/full_flow")
+def send_message_full_flow(req: ChatRequest):
+    """Uses the hierarchical full flow crew for end-to-end interactions."""
+    if req.chat_id not in chat_store.chats:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    chat_store.add_message(req.chat_id, "user", req.message)
+    history = chat_store.get_messages(req.chat_id)
+
+    response, rag_context = rag_chat_full_flow(req.message, history)
 
     chat_store.add_message(req.chat_id, "AI", str(response), rag_context=rag_context)
 

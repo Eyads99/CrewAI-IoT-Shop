@@ -240,7 +240,7 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
             "knowledge base to give users clear, step-by-step resolution paths."
         ),
         llm=MODEL,
-        tools=[troubleshooting_guide_search],  # scoped to its own tool
+        tools=[troubleshooting_guide_search],
         verbose=True
     )
 
@@ -280,8 +280,8 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
     summary_task = Task(
         description="Write a clear final response to the user based on the preceding information.",
         agent=writer,
-        # context=[main_task], # Showcasing CrewAI Context Feature
-        # output_file="iot_recommendation_report.md", # Showcasing CrewAI File Output/App Integration
+        # context=[main_task],
+        # output_file="iot_recommendation_report.md", # how CrewAI does File Output/App Integration
         expected_output='A formatted, clear, friendly, and concise response to the user, in no more than 100 words.'
     )
 
@@ -297,3 +297,116 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
         tracing=True
     )
 
+
+def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_list: list = None):
+    if rag_context_list is None:
+        rag_context_list = []
+
+    @tool("Search Smart Home Devices")
+    def search_smart_home_devices(query: str) -> str:
+        """Useful to search for smart home devices and IoT products based on a user query.
+        Returns a list of relevant products with descriptions, features, and prices."""
+        results = db.search(query)
+        rag_context_list.extend(results)
+        if not results:
+            return "No relevant products found."
+        context = "\n".join([
+            f"{r['name']}: {r['description']} (Features: {r['features']}, Price: {r['price']})"
+            for r in results
+        ])
+        return context
+
+    manager = Agent(
+        role="IoT End-to-End Manager",
+        goal="Route user queries to the appropriate agent based on their intent, ensuring a helpful and accurate response.",
+        backstory=(
+            "You are the central coordinator for an IoT device support and sales team. "
+            "You analyze user input to determine if they are just making small talk, asking for a specific device, "
+            "or looking for tailored recommendations based on their home. "
+            "Delegate the task to the right agent."
+        ),
+        llm=MODEL,
+        allow_delegation=True,
+        verbose=True
+    )
+
+    chitchat = Agent(
+        role="IoT Chit-Chat & Guardrail Specialist",
+        goal="Handle general greetings, small talk, and gracefully deflect non-IoT topics.",
+        backstory=(
+            "You are a friendly representative for an IoT smart home company. "
+            "You greet users and respond to casual small talk. "
+            "Crucially, if a user asks about anything NOT related to IoT or smart home devices (like politics, sports, general knowledge), "
+            "you politely explain that you can only assist with smart home and IoT topics."
+        ),
+        llm=MODEL,
+        verbose=True
+    )
+
+    home_profiler = Agent(
+        role="Home Profiler & Recommender",
+        goal="Gather home details if missing and recommend tailored smart home devices.",
+        backstory=(
+            "You specialize in full-home IoT setups. "
+            "If a user asks for broad recommendations without specifying their home details (number of bedrooms, bathrooms, living rooms,if there is a garden, etc.), "
+            "you ask clarifying questions to build a profile. "
+            "If the user has already provided a clear explanation of their home or if they ask for a specific group of products, "
+            "do not ask for more details; instead, use the Search Smart Home Devices tool to provide recommendations tailored to their setup."
+        ),
+        llm=MODEL,
+        tools=[search_smart_home_devices],
+        verbose=True
+    )
+
+    direct_recommender = Agent(
+        role="Direct Recommender",
+        goal="Directly recommend specific IoT products based on direct user requests.",
+        backstory=(
+            "You are an expert in finding the exact smart home device a user wants. "
+            "When a user asks for a specific product or category (e.g., 'a smart bulbs', 'a smart plugs', 'entertainment'), "
+            "you use the Search Smart Home Devices tool to find it and provide a clear, direct recommendation without asking unnecessary questions."
+        ),
+        llm=MODEL,
+        tools=[search_smart_home_devices],
+        verbose=True
+    )
+
+    writer = Agent(
+        role="Technical Writer",
+        goal="Summarize the final response clearly, ensuring it is formatted well and user-friendly.",
+        backstory="You are an experienced technical copywriter who formats outputs perfectly.",
+        llm="ollama/llama3.2:1b",
+        verbose=True
+    )
+
+    main_task = Task(
+        description=f"""
+        Analyze the user's query and provide the best response by delegating to the appropriate agent.
+        - If the user is making small talk or asking non-IoT questions, delegate to the Chit-Chat Specialist.
+        - If the user is asking for broad recommendations and hasn't described their home, delegate to the Home Profiler to ask for details (bedrooms, bathrooms, etc.).
+        - If the user describes their home or asks for a specific group of products, delegate to the Home Profiler to recommend devices.
+        - If the user asks for a single specific product (e.g., 'smart bulb'), delegate to the Direct Recommender.
+        
+        CHAT HISTORY:
+        {chat_history}
+        
+        USER QUESTION:
+        {topic}
+        """,
+        expected_output="A complete, accurate, and contextually appropriate response to the user's input.",
+    )
+
+    summary_task = Task(
+        description="Format and write the final response to the user based on the manager's delegation result.",
+        agent=writer,
+        expected_output="A well-formatted, friendly, and concise response addressing the user's query."
+    )
+
+    return Crew(
+        agents=[chitchat, home_profiler, direct_recommender, writer],
+        tasks=[main_task, summary_task],
+        manager_agent=manager,
+        process=Process.hierarchical,
+        verbose=True,
+        tracing=True
+    )

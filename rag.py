@@ -1,5 +1,5 @@
 from vector_db import SmartHomeVectorDB
-from crew import create_iot_crew, create_iot_crew_planner
+from crew import create_iot_crew, create_iot_crew_planner, create_iot_full_flow_crew
 
 def format_chat_history(messages, max_turns=5):
     # Keep last N turns to avoid token explosion
@@ -53,3 +53,14 @@ def rag_query(user_query: str):
     crew = create_crew_with_context(user_query, context)
 
     return crew.kickoff()
+
+
+def rag_chat_full_flow(user_query: str, chat_history: list):
+    """Use the hierarchical full flow crew for end-to-end interactions."""
+    history_text = format_chat_history(chat_history)
+
+    rag_context_list = []
+    crew = create_iot_full_flow_crew(user_query, history_text, rag_context_list=rag_context_list)
+
+    result = crew.kickoff()
+    return result, rag_context_list
