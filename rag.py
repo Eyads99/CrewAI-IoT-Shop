@@ -60,7 +60,7 @@ def rag_chat_full_flow(user_query: str, chat_history: list, user_data: dict = No
     history_text = format_chat_history(chat_history)
 
     rag_context_list = []
-    crew = create_iot_full_flow_crew(user_query, history_text, rag_context_list=rag_context_list, user_data=user_data)
+    crew, email_payload = create_iot_full_flow_crew(user_query, history_text, rag_context_list=rag_context_list, user_data=user_data)
 
     result = crew.kickoff()
-    return result, rag_context_list
+    return result, rag_context_list, email_payload

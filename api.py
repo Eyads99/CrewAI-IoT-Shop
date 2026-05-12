@@ -110,14 +110,20 @@ def send_message_full_flow(req: ChatRequest):
     chat_store.add_message(req.chat_id, "user", req.message)
     history = chat_store.get_messages(req.chat_id)
 
-    response, rag_context = rag_chat_full_flow(req.message, history, user_data=user_info)
+    response, rag_context, email_payload = rag_chat_full_flow(req.message, history, user_data=user_info)
 
     chat_store.add_message(req.chat_id, "AI", str(response), rag_context=rag_context)
 
-    return {
+    api_response = {
         "chat_id": req.chat_id,
         "response": str(response)
     }
+
+    # If the user confirmed they want an email, include the prepared email payload
+    if email_payload:
+        api_response["email"] = email_payload
+
+    return api_response
 
 @app.get("/chat/{chat_id}/history")
 def get_chat_history(chat_id: str):

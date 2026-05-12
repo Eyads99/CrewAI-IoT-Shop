@@ -302,6 +302,9 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     if rag_context_list is None:
         rag_context_list = []
 
+    # Shared dict for the email — populated by the tool and sent when filled
+    email_payload: dict = {}
+
     user_info_str = ""
     if user_data:
         user_info_str = f"USER INFORMATION: {user_data}\n"
@@ -320,6 +323,35 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         ])
         return context
 
+    @tool("Generate Recommendation Email")
+    def generate_recommendation_email(recommendations_summary: str) -> str:
+        """Call this tool ONLY when the user has explicitly confirmed they are done and
+        would like to receive an email with their device recommendations.
+        Pass a clear summary of the recommended devices as the argument.
+        The tool will prepare the email and confirm it is ready to be sent."""
+        receiver = user_data.get("email", "") if user_data else ""
+        name = user_data.get("name", "Valued Customer") if user_data else "Valued Customer"
+
+        subject = "Your Smart Home Device Recommendations from e&"
+        body = (
+            f"Dear {name},\n\n"
+            f"Thank you for using our Smart Home assistant. "
+            f"Here is a summary of the devices we recommended for you:\n\n"
+            f"{recommendations_summary}\n\n"
+            f"Feel free to reach out if you have any questions or need further assistance.\n\n"
+            f"Best regards,\n"
+            f"e& Smart Home Team"
+        )
+
+        email_payload["receiver"] = receiver
+        email_payload["subject"] = subject
+        email_payload["email_body"] = body
+
+        return (
+            f"Email prepared for {receiver}. "
+            "Please let the user know their recommendations have been compiled and the email is ready to be sent."
+        )
+
     manager = Agent(
         role="IoT End-to-End Manager",
         goal="Route user queries to the appropriate agent based on their intent, ensuring a helpful and accurate response.",
@@ -327,10 +359,24 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "You are the central coordinator for an IoT device support and sales team. "
             "You analyze user input to determine if they are just making small talk, asking for a specific device, "
             "or looking for tailored recommendations based on their home. "
-            "Delegate the task to the right agent."
+            "Delegate the task to the right agent. "
+            "After providing recommendations, always ask the user if they are done and if they would like an email summary. "
+            "If the user confirms both, delegate to the Email Specialist to prepare the email."
         ),
         llm=MODEL,
         allow_delegation=True,
+        verbose=True
+    )
+
+    email_agent = Agent(
+        role="Email Specialist",
+        goal="Prepare summary emails for users with their recommended IoT devices.",
+        backstory=(
+            "You are responsible for compiling all device recommendations into a professional email. "
+            "You use the Generate Recommendation Email tool to prepare the final payload for the user."
+        ),
+        llm=MODEL,
+        tools=[generate_recommendation_email],
         verbose=True
     )
 
@@ -389,12 +435,22 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         description=f"""
         Analyze the user's query and provide the best response by delegating to the appropriate agent.
         
-        {user_info_str} # place holder for now will be provide extra info as well later
+        {user_info_str}
         
         - If the user is making small talk or asking non-IoT questions, delegate to the Chit-Chat Specialist.
         - If the user is asking for broad recommendations and hasn't described their home, delegate to the Home Profiler to ask for details (bedrooms, bathrooms, etc.).
         - If the user describes their home or asks for a specific group of products, delegate to the Home Profiler to recommend devices.
         - If the user asks for a single specific product (e.g., 'smart bulb'), delegate to the Direct Recommender.
+
+        POST-RECOMMENDATION EMAIL FLOW:
+        - After any product recommendations have been provided in the chat history or in this turn,
+          you MUST ask the user TWO questions at the end of your response:
+            1. Are you done with your queries?
+            2. Would you like us to send you an email summary of the recommended devices?
+        - If the user's current message indicates they are done AND they want an email
+          (e.g. 'yes', 'yes please', 'send it', 'go ahead'), delegate to the Email Specialist
+          to compile a clear summary of all the products that were recommended during this conversation.
+        - Only involve the Email Specialist once the user has explicitly confirmed both conditions.
         
         CHAT HISTORY:
         {chat_history}
@@ -412,10 +468,10 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     )
 
     return Crew(
-        agents=[chitchat, home_profiler, direct_recommender, writer],
+        agents=[chitchat, home_profiler, direct_recommender, email_agent, writer],
         tasks=[main_task, summary_task],
         manager_agent=manager,
         process=Process.hierarchical,
         verbose=True,
         tracing=True
-    )
+    ), email_payload
