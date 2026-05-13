@@ -2,11 +2,14 @@ import os
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from data import smart_home_data
+# from data import smart_home_data removed hardcoded import of smart_home_data
+# now gets smart_home_data or elife depending on call
+
 
 class SmartHomeVectorDB:
-    def __init__(self):
+    def __init__(self, data=None):
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.data = data if data is not None else []
 
         self.dim = 384
         self.index = faiss.IndexFlatL2(self.dim)
@@ -14,10 +17,11 @@ class SmartHomeVectorDB:
         self.texts = []
         self.metadata = []
 
-        self._build_db()
+        if self.data:
+            self._build_db()
 
     def _build_db(self):
-        for item in smart_home_data:
+        for item in self.data:
             text = f"{item['name']} {item['category']} {item['description']} {item['features']} {item['price']}"
             embedding = self.model.encode(text)
 

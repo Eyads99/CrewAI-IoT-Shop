@@ -5,11 +5,14 @@ from vector_db import SmartHomeVectorDB
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
+from data import smart_home_data, smart_home_data_elife
 
 MODEL = os.getenv("LLM_MODEL", "ollama/llama3.2:1b")
 #MODEL = "ollama/llama3.2:1b"
 
-db = SmartHomeVectorDB()
+# Initialize separate databases for standard and e-life members
+db_standard = SmartHomeVectorDB(smart_home_data)
+db_elife = SmartHomeVectorDB(smart_home_data_elife)
 
 def create_crew_basic(topic: str):
     researcher = Agent(
@@ -306,14 +309,20 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     email_payload: dict = {}
 
     user_info_str = ""
+    is_elife = False
     if user_data:
         user_info_str = f"USER INFORMATION: {user_data}\n"
+        is_elife = user_data.get("elife_member", False)
 
-    @tool("Search Smart Home Devices")
+    # Choose the correct database based on membership
+    current_db = db_elife if is_elife else db_standard
+    tool_name = "Search Premium Smart Home Devices" if is_elife else "Search Smart Home Devices"
+
+    @tool("Search Smart Home Devices") # @tool(tool_name)
     def search_smart_home_devices(query: str) -> str:
         """Useful to search for smart home devices and IoT products based on a user query.
         Returns a list of relevant products with descriptions, features, and prices."""
-        results = db.search(query)
+        results = current_db.search(query)
         rag_context_list.extend(results)
         if not results:
             return "No relevant products found."
@@ -359,6 +368,8 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "You are the central coordinator for an IoT device support and sales team. "
             "You analyze user input to determine if they are just making small talk, asking for a specific device, "
             "or looking for tailored recommendations based on their home. "
+            "if they are looking for a device call the search_smart_home_devices agent to search for them in the database"
+            "only theses devices are sold and acceptable to be given to the user"
             "Delegate the task to the right agent. "
             "After providing recommendations, always ask the user if they are done and if they would like an email summary. "
             "If the user confirms both, delegate to the Email Specialist to prepare the email."
