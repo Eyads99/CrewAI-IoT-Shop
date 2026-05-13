@@ -301,6 +301,14 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
     )
 
 
+def _validate_phone_number(phone: str) -> bool:
+    """Mock phone validation. Accepts any number that contains 7–15 digits (with optional +/spaces/dashes).
+    In a real system this would trigger an OTP flow."""
+    import re
+    cleaned = re.sub(r'[\s\-().+]', '', phone)
+    return cleaned.isdigit() and 7 <= len(cleaned) <= 15
+
+
 def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_list: list = None, user_data: dict = None):
     if rag_context_list is None:
         rag_context_list = []
@@ -332,10 +340,24 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         ])
         return context
 
+    @tool("Verify Phone Number")
+    def verify_phone_number(phone: str) -> str:
+        """Call this tool to verify the user's phone number before generating the recommendation email.
+        Pass the phone number string provided by the user as the argument.
+        Returns a confirmation if the number is valid, or an error message if it is not."""
+        if _validate_phone_number(phone):
+            return (
+                f"Phone number '{phone}' has been verified successfully. "
+                "You may now proceed to generate the recommendation email."
+            )
+        return (
+            f"Phone number '{phone}' is not valid. "
+            "Please ask the user to provide a valid phone number (7–15 digits, optionally starting with +)."
+        )
+
     @tool("Generate Recommendation Email")
     def generate_recommendation_email(recommendations_summary: str) -> str:
-        """Call this tool ONLY when the user has explicitly confirmed they are done and
-        would like to receive an email with their device recommendations.
+        """Call this tool ONLY after the user's phone number has been successfully verified.
         Pass a clear summary of the recommended devices as the argument.
         The tool will prepare the email and confirm it is ready to be sent."""
         receiver = user_data.get("email", "") if user_data else ""
@@ -381,13 +403,15 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
 
     email_agent = Agent(
         role="Email Specialist",
-        goal="Prepare summary emails for users with their recommended IoT devices.",
+        goal="Verify the user's phone number and then prepare summary emails for users with their recommended IoT devices.",
         backstory=(
-            "You are responsible for compiling all device recommendations into a professional email. "
-            "You use the Generate Recommendation Email tool to prepare the final payload for the user."
+            "You are responsible for securely verifying users before sending emails. "
+            "You MUST first use the Verify Phone Number tool with the phone number provided by the user. "
+            "Only if verification succeeds, use the Generate Recommendation Email tool to prepare the final payload. "
+            "If verification fails, inform the user and ask them to provide a valid phone number."
         ),
         llm=MODEL,
-        tools=[generate_recommendation_email],
+        tools=[verify_phone_number, generate_recommendation_email],
         verbose=True
     )
 
@@ -459,9 +483,12 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             1. Are you done with your queries?
             2. Would you like us to send you an email summary of the recommended devices?
         - If the user's current message indicates they are done AND they want an email
-          (e.g. 'yes', 'yes please', 'send it', 'go ahead'), delegate to the Email Specialist
-          to compile a clear summary of all the products that were recommended during this conversation.
-        - Only involve the Email Specialist once the user has explicitly confirmed both conditions.
+          (e.g. 'yes', 'yes please', 'send it', 'go ahead'), do NOT delegate to the Email Specialist yet.
+          Instead, ask the user to provide their phone number for identity verification (OTP step).
+        - ONLY after the user has provided a phone number in their message, delegate to the Email Specialist.
+          Pass the phone number from the user's message to the Email Specialist so it can be verified.
+          The Email Specialist will verify the number first, and only then generate the email.
+        - Do NOT skip the phone verification step. The email must never be prepared without a verified phone number.
         
         CHAT HISTORY:
         {chat_history}
