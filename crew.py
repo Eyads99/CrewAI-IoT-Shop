@@ -448,7 +448,13 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         backstory=(
             "You are an expert in finding the exact smart home device a user wants. "
             "When a user asks for a specific product or category (e.g., 'a smart bulbs', 'a smart plugs', 'entertainment'), "
-            "you use the Search Smart Home Devices tool to find it and provide a clear, direct recommendation without asking unnecessary questions."
+            "you use the Search Smart Home Devices tool to find it and provide a clear, direct recommendation "
+            "without asking unnecessary questions.\n\n"
+            "CRITICAL RULES:\n"
+            "1. You MUST first search for any requested products using the Search Smart Home Devices tool.\n"
+            "2. You MUST NOT provide information, features, specifications, or comparisons for ANY product that is NOT explicitly returned by the tool.\n"
+            "3. If the user asks about a product not found in the search results, or asks to compare products where one or more are missing from the results, you MUST refuse to discuss or compare the missing products. State clearly that you can only provide information on products available in the e& catalog.\n"
+            "4. If a requested product is not found, recommend a similar product from the search results, or say that e& does not have a similar product currently available."
         ),
         llm=MODEL,
         tools=[search_smart_home_devices],
@@ -534,8 +540,8 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     )
 
     return Crew(
-        agents=[chitchat, home_profiler, direct_recommender, email_agent, writer, security_guardrail],
-        tasks=[main_task, summary_task, guardrail_task],
+        agents=[chitchat, home_profiler, direct_recommender, email_agent, writer, ], #security_guardrail
+        tasks=[main_task, summary_task, ], #guardrail_task
         manager_agent=manager,
         process=Process.hierarchical,
         verbose=True,
