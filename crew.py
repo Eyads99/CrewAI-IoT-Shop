@@ -10,7 +10,6 @@ from data import smart_home_data, smart_home_data_elife
 MODEL = os.getenv("LLM_MODEL", "ollama/llama3.2:1b")
 #MODEL = "ollama/llama3.2:1b"
 
-# Initialize separate databases for standard and e-life members
 db_standard = SmartHomeVectorDB(smart_home_data)
 db_elife = SmartHomeVectorDB(smart_home_data_elife)
 
@@ -313,7 +312,6 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     if rag_context_list is None:
         rag_context_list = []
 
-    # Shared dict for the email — populated by the tool and sent when filled
     email_payload: dict = {}
 
     user_info_str = ""
@@ -322,7 +320,6 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         user_info_str = f"USER INFORMATION: {user_data}\n"
         is_elife = user_data.get("elife_member", False)
 
-    # Choose the correct database based on membership
     current_db = db_elife if is_elife else db_standard
     tool_name = "Search Premium Smart Home Devices" if is_elife else "Search Smart Home Devices"
 
