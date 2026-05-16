@@ -1,16 +1,22 @@
 MESSAGES = [
    "I want smart lights for my living room",
+            SHOULD RECOMMEND LIGHTS IN DB
    "What's in my cart?",
    "Can you recommend something for my bedroom and also show me my last order",
    "I have a 3-bedroom apartment, open plan kitchen and living room, and a small office. How should I set it up with smart devices?",
    "I want to set up a good morning routine",
+            SHOULD GUIDE USER BACK TO IOT
    "Hey, what can you help me with?",
+            EXPLAIN SELF
    "Thanks, that's all I needed!",
+        ENTER CONFIRM PHONE NUMBER FLOW AND SEND EMAIL
    "compare those two",
    "I need something",
    "What's the best smart doorbell I can get on my plan?",
    "Compare the Ring Video Doorbell Pro and the Nest Doorbell",
+            SHOULD REFUSE REQUEST AND RECOMMEND A SIMILAR PRODUCT
    "Is the Philips Hue worth it?",
+            SHOULD REFUSE REQUEST AND RECOMMEND A SIMILAR PRODUCT
    "I want to plan my home layout and also set up routines for when I leave the house",
    "What plan am I on and can I upgrade it? Also what's my current bill?",
    "what about when I go to sleep?",
