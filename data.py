@@ -27,6 +27,15 @@ smart_home_data = [
         "price": "100.00 AED",
     },
     {
+        "id": "lock_002",
+        "name": "Smart Door Lock PLus",
+        "category": "Security",
+        "description": "Keyless entry system controlled via mobile app, fingerprint or facial recognition.",
+        "features": "Fingerprint,facial recognition, PIN, remote unlock, auto-lock",
+        "url": "example.com/lock_002",
+        "price": "150.00 AED",
+    },
+    {
         "id": "smoke_001",
         "name": "Smart Smoke Detector",
         "category": "Safety",
@@ -43,6 +52,15 @@ smart_home_data = [
         "features": "1080p, motion alerts, cloud storage, night vision",
         "url": "example.com/cam_001",
         "price": "200.00 AED",
+    },
+    {
+        "id": "cam_002",
+        "name": "Smart Security Camera plus",
+        "category": "Security",
+        "description": "Indoor/outdoor camera with motion detection and night vision.",
+        "features": "1080p, motion alerts, cloud storage, night vision, automatic object tracking",
+        "url": "example.com/cam_002",
+        "price": "250.00 AED",
     },
     {
         "id": "cam_001",
@@ -63,6 +81,15 @@ smart_home_data = [
         "price": "25 AED",
     },
     {
+        "id": "plug_002",
+        "name": "Smart Plug plus",
+        "category": "Energy",
+        "description": "Turns any appliance into a smart device with remote control and optimizes electricity usage by learning device usage.",
+        "features": "App control, scheduling, energy monitoring, electricity use optimization",
+        "url": "example.com/plug_002",
+        "price": "75 AED",
+    },
+    {
         "id": "speaker_001",
         "name": "Smart Voice Speaker",
         "category": "Entertainment",
@@ -70,6 +97,15 @@ smart_home_data = [
         "features": "Voice assistant, Bluetooth, WiFi streaming, multi-room sync",
         "url": "example.com/speaker_001",
         "price": "45.00 AED"
+    },
+    {
+        "id": "tv_002",
+        "name": "Smart 1080P TV",
+        "category": "Entertainment",
+        "description": "HD smart television with built-in streaming apps and voice assistant support.",
+        "features": "1080P, HDR, screen casting, WiFi connectivity",
+        "url": "example.com/tv_002",
+        "price": "350.00 AED"
     },
     {
         "id": "tv_001",
