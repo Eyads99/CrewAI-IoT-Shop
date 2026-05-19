@@ -321,7 +321,7 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         is_elife = user_data.get("elife_member", False)
 
     current_db = db_elife if is_elife else db_standard
-    tool_name = "Search Premium Smart Home Devices" if is_elife else "Search Smart Home Devices"
+    # tool_name = "Search Premium Smart Home Devices" if is_elife else "Search Smart Home Devices"
 
     @tool("Search Smart Home Devices") # @tool(tool_name)
     def search_smart_home_devices(query: str) -> str:
@@ -413,15 +413,19 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     )
 
     chitchat = Agent(
-        role="IoT Chit-Chat & Guardrail Specialist",
+        role="IoT Chit-Chat Specialist",
         goal="Handle general greetings, small talk, and gracefully deflect non-IoT topics.",
         backstory=(
-            "You are a friendly representative for an IoT smart home company. "
+            "You are a friendly representative for an Emirati company e& selling IoT smart home company. "
             "You greet users and respond to casual small talk. "
             "Crucially, if a user asks about anything NOT related to IoT or smart home devices "
             "(like politics, sports, general knowledge), "
             "you politely explain that you can only assist with smart home and IoT topics."
             "If asked say that you can not comment about other companies or other products"
+            "Never claim to be human. Talk like a knowledgeable friend who's "
+            "genuinely excited about smart home tech. "
+            "If the user asks 'who are you', 'what can you do', 'help', or similar — briefly introduce yourself and "
+            "mention key capabilities and limitations (e.g. can't checkout or modify cart), and offer a next step."
         ),
         llm=MODEL,
         verbose=True
@@ -436,6 +440,11 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "you ask clarifying questions to build a profile. "
             "If the user has already provided a clear explanation of their home or if they ask for a specific group of products, "
             "do not ask for more details; instead, use the Search Smart Home Devices tool to provide recommendations tailored to their setup."
+            "Use natural conversational phrasing — say "
+            "'This one's great for…' not 'This product offers the capability of…'. "
+            "Be warm, concise, and lightly enthusiastic. "
+            "Avoid corporate script, filler phrases ('Thank you for providing…', 'Great choice!'). "
+            "Start with the answer; keep it as short as the answer needs to be. "
         ),
         llm=MODEL,
         tools=[search_smart_home_devices],
@@ -455,6 +464,11 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "2. You MUST NOT provide information, features, specifications, or comparisons for ANY product that is NOT explicitly returned by the tool.\n"
             "3. If the user asks about a product not found in the search results, or asks to compare products where one or more are missing from the results, you MUST refuse to discuss or compare the missing products. State clearly that you can only provide information on products available in the e& catalog.\n"
             "4. If a requested product is not found, recommend a similar product from the search results, or say that e& does not have a similar product currently available."
+            "Use natural conversational phrasing — say "
+            "'This one's great for…' not 'This product offers the capability of…'. "
+            "Be warm, concise, and lightly enthusiastic. "
+            "Avoid corporate script, filler phrases ('Thank you for providing…', 'Great choice!')."
+
         ),
         llm=MODEL,
         tools=[search_smart_home_devices],
@@ -471,7 +485,7 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
 
     security_guardrail = Agent(
         role="Security and Appropriateness Guardrail",
-        goal="Ensure the final response contains no inappropriate content or security issues.",
+        goal="Ensure the final response contains no inappropriate content or security issues. Do not change safe content.",
         backstory=(
             "You are a strict safety monitor. "
             "Your job is to review the final response before it is sent to the user. "
@@ -534,9 +548,14 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     )
 
     guardrail_task = Task(
-        description="Review the final response from the Technical Writer. Leave the safe content exactly as is, but remove any inappropriate content, profanity, or security issues.",
+        description="Review the final response from the Technical Writer."
+                    "Leave the safe content exactly as is, but remove any inappropriate content, "
+                    "profanity, or security issues.",
         agent=security_guardrail,
-        expected_output="The final safe and cleaned response to be returned to the user."
+        expected_output="The final safe and cleaned response to be returned to the user in plain text, "
+                        "using natural conversational phrasing"
+                        "Must not include meta-commentary like 'I removed...' or 'This is safe because...'. "
+                        "Just the response itself."
     )
 
     return Crew(
