@@ -380,6 +380,30 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "Please let the user know their recommendations have been compiled and the email is ready to be sent."
         )
 
+    @tool("Get Current Cart")
+    def get_current_cart() -> str:
+        """Retrieve the user's current shopping cart contents.
+        Call this when the user asks about their cart, or before making recommendations
+        to avoid suggesting items they already have in their cart."""
+
+        # Dummy data — replace with real DB/API call later
+        dummy_cart = [
+            {"item": "Smart Door Lock", "price": 100.00, "qty": 1},
+            {"item": "Smart Smoke Detector", "price": 150.00, "qty": 2},
+        ]
+
+        if not dummy_cart:
+            return "The user's cart is currently empty."
+
+        lines = "\n".join([
+            f"- {entry['item']} x{entry['qty']} @ AED {entry['price']:.2f}"
+            for entry in dummy_cart
+        ])
+        total = sum(e['price'] * e['qty'] for e in dummy_cart)
+        return f"Current cart:\n{lines}\nTotal: AED {total:.2f}"
+
+    # agents
+
     manager = Agent(
         role="IoT End-to-End Manager",
         goal="Route user queries to the appropriate agent based on their intent, ensuring a helpful and accurate response.",
@@ -389,6 +413,7 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "or looking for tailored recommendations based on their home. "
             "if they are looking for a device call the search_smart_home_devices agent to search for them in the database"
             "only theses devices are sold and acceptable to be given to the user"
+            "If the user asks for the current cart call the cart_agent agent to get the cart info. "
             "Delegate the task to the right agent. "
             "After providing recommendations, always ask the user if they are done and if they would like an email summary. "
             "If the user confirms both, delegate to the Email Specialist to prepare the email."
@@ -397,6 +422,16 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
         allow_delegation=True,
         verbose=True
     )
+
+    cart_agent = Agent(
+        role="Cart Specialist",
+        goal="Retrieve and summarize the user's current cart when asked.",
+        backstory="You retrieve the user's current cart contents and present them clearly.",
+        llm=MODEL,
+        tools=[get_current_cart],
+        verbose=True
+    )
+
 
     email_agent = Agent(
         role="Email Specialist",
@@ -559,7 +594,7 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
     )
 
     return Crew(
-        agents=[chitchat, home_profiler, direct_recommender, email_agent, writer, ], #security_guardrail
+        agents=[chitchat, home_profiler, direct_recommender, email_agent, writer,cart_agent ], #security_guardrail
         tasks=[main_task, summary_task, ], #guardrail_task
         manager_agent=manager,
         process=Process.hierarchical,

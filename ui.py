@@ -49,14 +49,15 @@ if prompt := st.chat_input("Ask about IoT devices..."):
 
     # Send to backend
     with st.chat_message("assistant"):
-        with st.spinner("Analyzing request and recommending devices..."):
+        with st.spinner("Analyzing request"):
             try:
                 res = requests.post(
-                    f"{API_URL}/chat/send",
-                    json={"chat_id": st.session_state.chat_id, "message": prompt}
+                    f"{API_URL}/chat/send/full_flow",
+                    json={"chat_id": st.session_state.chat_id, "message": prompt,"email":"eyad@example.com"}
                 )
                 res.raise_for_status()
-                response_text = res.json().get("response", "No response.")['raw']
+                print(res.json())
+                response_text = res.json().get("response", "No response.")
                 st.markdown(response_text)
                 
                 # Add assistant response to chat history

@@ -286,7 +286,11 @@ user_data = [
         "email": "ahmed@example.com",
         "elife_member": True,
         "crm": "postpaid",
-        "phone": "123456789"
+        "phone": "123456789",
+        "previousOrders": {
+            "Smart Plug (Premium)": 2,
+            "Smart Thermostat (Premium)": 1
+        }
     },
     {
         "id": "2",
@@ -294,7 +298,9 @@ user_data = [
         "email": "mohamed@example.com",
         "crm": "postpaid",
         "elife_member": False,
-        "phone": "987654321"
+        "phone": "987654321",
+        "previousOrders": {
+        }
     },
     {
         "id": "3",
@@ -302,7 +308,11 @@ user_data = [
         "email": "eyad@example.com",
         "elife_member": False,
         "crm": "prepaid",
-        "phone": "123456789"
+        "phone": "123456789",
+        "previousOrders": {
+            "Smart Refrigerator": 1,
+            "Smart 4K TV": 1
+        }
     },
 ]
 
