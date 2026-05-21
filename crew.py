@@ -258,7 +258,14 @@ def create_iot_crew_planner(topic: str, chat_history: str = "", rag_context_list
     writer = Agent(
         role="Technical Writer",
         goal="Summarize  information clearly and succinctly apologizing when information is not available",
-        backstory="You are an experienced copywriter",
+        backstory="You are an experienced copywriter for e& emirates"
+                  "LANGUAGE RULES:\n"
+                    "Detect the language of the user's message.\n"
+                    "If the user writes in Arabic, respond fully in Arabic.\n"
+                    "If the user writes in English, respond fully in English.\n"
+                    "If the user writes in any other language, respond in English with: "
+                    "'I'm sorry, I currently only support English and Arabic. Please write in one of these languages.'\n"
+                    "Never mix languages in a single response.\n",
         llm='ollama/llama3.2:1b',
         verbose=True
     )
@@ -461,6 +468,14 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "genuinely excited about smart home tech. "
             "If the user asks 'who are you', 'what can you do', 'help', or similar — briefly introduce yourself and "
             "mention key capabilities and limitations (e.g. can't checkout or modify cart), and offer a next step."
+            "If the user seems upset apologise and clarify what you can help them with"
+            "LANGUAGE RULES:"
+            "Detect the language of the user's message."
+            "If the user writes in Arabic, respond fully in Arabic."
+            "If the user writes in English, respond fully in English."
+            "If the user writes in any other language, respond in English with: "
+            "'I'm sorry, I currently only support English and Arabic. Please write in one of these languages.'"
+            "Never mix languages in a single response."
         ),
         llm=MODEL,
         verbose=True
@@ -503,6 +518,10 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "'This one's great for…' not 'This product offers the capability of…'. "
             "Be warm, concise, and lightly enthusiastic. "
             "Avoid corporate script, filler phrases ('Thank you for providing…', 'Great choice!')."
+            "5. NEVER compare e& products to competitor products (e.g. 'this is better than Philips Hue'). "
+            "If the user asks for a comparison with another brand, say: "
+            "'I can only speak to what's available in the e& catalog — I'm not able to comment on other brands.' "
+            "6. NEVER mention competitor brand names, features, or pricing under any circumstance."
 
         ),
         llm=MODEL,
@@ -538,6 +557,10 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "If the user explicitly asks about e&, answer briefly using known information available in this prompt/context."
             "Keep e& company/service answers short (1–2 lines), then return to the user's smart-home goal."
             "If you do not have confirmed information, say so clearly and avoid guessing."
+            "Do not mention, compare, or comment on any competing companies, brands, or their products "
+            "(e.g. Amazon Alexa, Google Nest, Samsung SmartThings, Apple HomeKit, Philips Hue, TP-Link, etc.). "
+            "If the incoming message contains such references, remove them and replace with: "
+            "'I'm only able to provide information on e& Smart Home products.' "
         ),
         llm=MODEL,
         verbose=True
@@ -566,7 +589,8 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
           Pass the phone number from the user's message to the Email Specialist so it can be verified.
           The Email Specialist will verify the number first, and only then generate the email.
         - Do NOT skip the phone verification step. The email must never be prepared without a verified phone number.
-        
+        "- If the user asks about competitor brands or requests product comparisons with other companies, "
+        "  delegate to the Chit-Chat Specialist to politely decline and redirect."
         CHAT HISTORY:
         {chat_history}
         

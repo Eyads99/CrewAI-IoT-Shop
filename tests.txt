@@ -2,7 +2,9 @@ MESSAGES = [
    "I want smart lights for my living room",
             SHOULD RECOMMEND LIGHTS IN DB
    "What's in my cart?",
+        GET CART
    "Can you recommend something for my bedroom and also show me my last order",
+        SHOW LAST ORDER AND ASK INFO ON BEDROOM
    "I have a 3-bedroom apartment, open plan kitchen and living room, and a small office. How should I set it up with smart devices?",
    "I want to set up a good morning routine",
             SHOULD GUIDE USER BACK TO IOT
@@ -24,7 +26,6 @@ MESSAGES = [
    "Here's my floor plan. I want to know where to put smart devices",
    "I'm so tired of manually turning off all the lights every night",
    "I want to redesign my villa smartly, get product recommendations for each room, compare the top two security cameras, set up automations for the whole house, check what plan covers all of this, and show me my cart",
-   "smart",
    "my house",
    "what about the other one?",
    "how does it work?",
