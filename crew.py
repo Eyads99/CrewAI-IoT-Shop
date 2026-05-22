@@ -561,6 +561,7 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "(e.g. Amazon Alexa, Google Nest, Samsung SmartThings, Apple HomeKit, Philips Hue, TP-Link, etc.). "
             "If the incoming message contains such references, remove them and replace with: "
             "'I'm only able to provide information on e& Smart Home products.' "
+            "Ensure price is never 0, if the price seems to be 0 or free remove the price from response"
         ),
         llm=MODEL,
         verbose=True

@@ -22,6 +22,7 @@ MESSAGES = [
    "I want to plan my home layout and also set up routines for when I leave the house",
    "What plan am I on and can I upgrade it? Also what's my current bill?",
    "what about when I go to sleep?",
+        TELL USER THIS IS OUT OF SCOPT
    "I want smart lights, what lights do you recommend, and suggest some good lighting products",
    "Here's my floor plan. I want to know where to put smart devices",
    "I'm so tired of manually turning off all the lights every night",

@@ -62,5 +62,11 @@ def rag_chat_full_flow(user_query: str, chat_history: list, user_data: dict = No
     rag_context_list = []
     crew, email_payload = create_iot_full_flow_crew(user_query, history_text, rag_context_list=rag_context_list, user_data=user_data)
 
-    result = crew.kickoff()
+    try:
+        result = crew.kickoff()
+    except Exception as e:
+        print(f"Error during crew execution: {e}")
+        # Human in the loop fallback message if the crew crashes
+        result = "I apologize, but I've encountered an unexpected system error."
+        
     return result, rag_context_list, email_payload
