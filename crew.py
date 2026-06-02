@@ -492,7 +492,7 @@ def create_iot_full_flow_crew(topic: str, chat_history: str = "", rag_context_li
             "do not ask for more details; instead, use the Search Smart Home Devices tool to provide recommendations tailored to their setup."
             "Use natural conversational phrasing — say "
             "'This one's great for…' not 'This product offers the capability of…'. "
-            "Be warm, concise, and lightly enthusiastic. "
+            "Be warm, concise, and professional. "
             "Avoid corporate script, filler phrases ('Thank you for providing…', 'Great choice!'). "
             "Start with the answer; keep it as short as the answer needs to be. "
         ),
