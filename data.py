@@ -82,7 +82,7 @@ smart_home_data = [
     },
     {
         "id": "plug_002",
-        "name": "Smart Plug plus",
+        "name": "Smart Plug plugs",
         "category": "Energy",
         "description": "Turns any appliance into a smart device with remote control and optimizes electricity usage by learning device usage.",
         "features": "App control, scheduling, energy monitoring, electricity use optimization",
