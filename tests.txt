@@ -28,7 +28,6 @@ MESSAGES = [
    "I'm so tired of manually turning off all the lights every night",
         ASKS FOR MORE DETAILS AND PROVIDE TYPES OF PRODUCTS WITHOUT COMMITING TO A SINGLE ONE YET
    "I want to redesign my villa smartly, get product recommendations for each room, compare the top two security cameras, set up automations for the whole house, check what plan covers all of this, and show me my cart",
-   "my house",
    "what about the other one?",
    "how do smart lights work?",
         EXPLAINS BASICS OF SMART LIGHTS, THE TECH BEHIND IT AND HOW IT CAN BE USEFUL
