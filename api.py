@@ -122,7 +122,7 @@ def send_message_full_flow(req: ChatRequest):
     # If the user confirmed they want an email, include the prepared email payload
     if email_payload:
         api_response["email"] = email_payload
-
+        print("email payload",email_payload)
     return api_response
 
 @app.get("/chat/{chat_id}/history")

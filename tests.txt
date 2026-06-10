@@ -34,3 +34,28 @@ MESSAGES = [
    "I want to add a smart thermostat to my home. What should I get?"
         PROVIDES AVAILABLE SMART THERMOSTATS WITH PRICE
    ]
+
+    Hello I have a new apartment and I want to get some new devices what do you recommend?
+        QUESTIONS ABOUT HOME
+    I have two bedrooms, two bathrooms and a living room
+        SOME DEVICE SUGGESTIONS
+    What smart plugs do you have?
+        TELL USER ABOUT PLUGS
+    What about Philips Hue is it worth it?
+        TELL USER THIS IS OUT OF SCOPE
+    Do you have any smart lights?
+        TELL USER ABOUT AVAILABLE SMART LIGHTS
+    how much do they cost
+        TELL USER COST
+    Yes I am done please send me an Email
+        ASK FOR PHONE NUMBER
+    0123
+        TELL USER THIS IS AN INVALID PHONE NUMBER
+    0123456789
+        TELL USER EMAIL WILL BE SENT
+
+
+
+
+
+
