@@ -47,6 +47,8 @@ MESSAGES = [
         TELL USER ABOUT AVAILABLE SMART LIGHTS
     how much do they cost
         TELL USER COST
+    What is in my CART
+        CONTENTS OF CART
     Yes I am done please send me an Email
         ASK FOR PHONE NUMBER
     0123
